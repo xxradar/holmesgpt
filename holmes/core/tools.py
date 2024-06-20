@@ -7,6 +7,7 @@ from typing import Dict, List, Literal, Optional, Union
 
 from jinja2 import Template
 from pydantic import BaseModel, ConfigDict, PrivateAttr
+from security import safe_command
 
 ToolsetPattern = Union[Literal['*'], List[str]]
 
@@ -107,8 +108,7 @@ class YAMLTool(BaseModel):
 
     def __execute_subprocess(self, cmd) -> str:
         try:
-            result = subprocess.run(
-                cmd, shell=True, capture_output=True, text=True, check=True, stdin=subprocess.DEVNULL
+            result = safe_command.run(subprocess.run, cmd, shell=True, capture_output=True, text=True, check=True, stdin=subprocess.DEVNULL
             )
             return f"stdout:\n{result.stdout}\nstderr:\n{result.stderr}"
         except subprocess.CalledProcessError as e:
@@ -149,7 +149,7 @@ class Toolset(BaseModel):
     def check_prerequisites(self):
         for prereq in self.prerequisites:
             try:
-                result = subprocess.run(prereq.command, shell=True, check=True, text=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+                result = safe_command.run(subprocess.run, prereq.command, shell=True, check=True, text=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
                 if prereq.expected_output and prereq.expected_output not in result.stdout:
                     self._enabled = False
                     self._disabled_reason = f"prereq check gave wrong output"
