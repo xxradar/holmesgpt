@@ -1,9 +1,8 @@
 import re
-from typing import List, Literal, Optional, Pattern
+from typing import List, Optional, Pattern
 
 import humanize
-import requests
-from pydantic import BaseModel, ValidationError, parse_obj_as, validator
+from pydantic import parse_obj_as
 from requests.auth import HTTPBasicAuth
 
 from holmes.core.issue import Issue
@@ -11,6 +10,7 @@ from holmes.plugins.interfaces import SourcePlugin
 from holmes.plugins.utils import dict_to_markdown
 
 from .models import PrometheusAlert, PrometheusGettableAlert
+from security import safe_requests
 
 
 class AlertManagerSource(SourcePlugin):
@@ -46,7 +46,7 @@ class AlertManagerSource(SourcePlugin):
         else:
             auth = None
 
-        response = requests.get(fetch_alerts_url, params=params, auth=auth)
+        response = safe_requests.get(fetch_alerts_url, params=params, auth=auth)
         if response.status_code != 200:
             raise Exception(
                 f"Failed to get live alerts: {response.status_code} {response.text}"

@@ -2,9 +2,10 @@ import logging
 from holmes.core.tool_calling_llm import LLMResult
 from holmes.plugins.interfaces import SourcePlugin
 from holmes.core.issue import Issue
-from typing import List, Pattern, Optional
+from typing import List, Optional
 import requests
 import markdown
+from security import safe_requests
 
 OPSGENIE_TEAM_INTEGRATION_KEY_HELP = "OpsGenie Team Integration key for writing back results. (NOT a normal API Key.) Get it from Teams > YourTeamName > Integrations > Add Integration > API Key. Don't forget to turn on the integration!"
 
@@ -29,7 +30,7 @@ class OpsGenieSource(SourcePlugin):
             }
             while url:
                 # TODO: also fetch notes and description
-                response = requests.get(url, headers=headers, params=params)
+                response = safe_requests.get(url, headers=headers, params=params)
                 logging.debug(f"Got {response.json()}")
                 if response.status_code != 200:
                     raise Exception(f"Failed to get alerts: {response.status_code} {response.text}")
@@ -76,7 +77,7 @@ class OpsGenieSource(SourcePlugin):
         # Now we need to lookup the request to see if it succeeded
         request_id = response.json().get("requestId", None)
         url = f"https://api.opsgenie.com/v2/alerts/requests/{request_id}"
-        response = requests.get(url=url, headers=headers)
+        response = safe_requests.get(url=url, headers=headers)
 
         logging.debug(f"Response: {response.json()}")
         response.raise_for_status()

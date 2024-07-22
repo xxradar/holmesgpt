@@ -1,12 +1,12 @@
 import logging
-from typing import List, Pattern, Optional
+from typing import List, Optional
 
 import requests
-from pydantic import BaseModel
 
 from holmes.core.issue import Issue
 from holmes.core.tool_calling_llm import LLMResult
 from holmes.plugins.interfaces import SourcePlugin
+from security import safe_requests
 
 class PagerDutySource(SourcePlugin):
 
@@ -29,8 +29,7 @@ class PagerDutySource(SourcePlugin):
             else:
                 query_params = ""
 
-            response = requests.get(
-                f"{self.api_url}/incidents{query_params}",
+            response = safe_requests.get(f"{self.api_url}/incidents{query_params}",
                 headers=headers
             )
             if response.status_code != 200:

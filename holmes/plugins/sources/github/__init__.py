@@ -2,9 +2,10 @@ import logging
 from holmes.core.tool_calling_llm import LLMResult
 from holmes.plugins.interfaces import SourcePlugin
 from holmes.core.issue import Issue
-from typing import List, Pattern
+from typing import List
 from holmes.core.tool_calling_llm import LLMResult
 import requests
+from security import safe_requests
 
 
 class GitHubSource(SourcePlugin):
@@ -31,8 +32,7 @@ class GitHubSource(SourcePlugin):
             default_q = f"repo:{self.owner}/{self.repository}"
             params["q"] = f"{default_q} {self.query}"
             while url:
-                response = requests.get(
-                    url=url, headers=headers, params=params)
+                response = safe_requests.get(url=url, headers=headers, params=params)
                 if response.status_code != 200:
                     raise Exception(f"Failed to get issues:{response.status_code} {response.text}")
                 logging.info(f"Got {response}")
