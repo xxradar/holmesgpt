@@ -46,7 +46,7 @@ class AlertManagerSource(SourcePlugin):
         else:
             auth = None
 
-        response = requests.get(fetch_alerts_url, params=params, auth=auth)
+        response = requests.get(fetch_alerts_url, params=params, auth=auth, timeout=60)
         if response.status_code != 200:
             raise Exception(
                 f"Failed to get live alerts: {response.status_code} {response.text}"

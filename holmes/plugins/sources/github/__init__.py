@@ -32,7 +32,7 @@ class GitHubSource(SourcePlugin):
             params["q"] = f"{default_q} {self.query}"
             while url:
                 response = requests.get(
-                    url=url, headers=headers, params=params)
+                    url=url, headers=headers, params=params, timeout=60)
                 if response.status_code != 200:
                     raise Exception(f"Failed to get issues:{response.status_code} {response.text}")
                 logging.info(f"Got {response}")
@@ -67,8 +67,8 @@ class GitHubSource(SourcePlugin):
         response = requests.post(
             url=url,
             json={"body": f"Automatic AI Investigation by Robusta:\n\n{result_data.result}\n"},
-            headers=headers
-        )
+            headers=headers, 
+        timeout=60)
 
         response.raise_for_status()
         data = response.json()

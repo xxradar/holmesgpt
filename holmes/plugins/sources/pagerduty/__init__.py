@@ -31,8 +31,8 @@ class PagerDutySource(SourcePlugin):
 
             response = requests.get(
                 f"{self.api_url}/incidents{query_params}",
-                headers=headers
-            )
+                headers=headers, 
+            timeout=60)
             if response.status_code != 200:
                 print(f"Got response: {response}")
                 raise Exception(
@@ -75,8 +75,8 @@ class PagerDutySource(SourcePlugin):
             response = requests.post(
                 url,
                 json=comment_data,
-                headers=headers
-            )
+                headers=headers, 
+            timeout=60)
             response.raise_for_status()
             data = response.json()
             logging.debug(f"Comment added to issue {issue_id}: {data}")

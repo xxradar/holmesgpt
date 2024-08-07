@@ -29,7 +29,7 @@ class OpsGenieSource(SourcePlugin):
             }
             while url:
                 # TODO: also fetch notes and description
-                response = requests.get(url, headers=headers, params=params)
+                response = requests.get(url, headers=headers, params=params, timeout=60)
                 logging.debug(f"Got {response.json()}")
                 if response.status_code != 200:
                     raise Exception(f"Failed to get alerts: {response.status_code} {response.text}")
@@ -67,8 +67,8 @@ class OpsGenieSource(SourcePlugin):
         response = requests.post(
             url=url,
             json={"note": f"Automatic AI Investigation by Robusta:\n\n{html_output}\n"},
-            headers=headers
-        )
+            headers=headers, 
+        timeout=60)
         logging.debug(f"Response: {response.json()}")
         response.raise_for_status()
 
@@ -76,7 +76,7 @@ class OpsGenieSource(SourcePlugin):
         # Now we need to lookup the request to see if it succeeded
         request_id = response.json().get("requestId", None)
         url = f"https://api.opsgenie.com/v2/alerts/requests/{request_id}"
-        response = requests.get(url=url, headers=headers)
+        response = requests.get(url=url, headers=headers, timeout=60)
 
         logging.debug(f"Response: {response.json()}")
         response.raise_for_status()

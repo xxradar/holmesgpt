@@ -29,7 +29,7 @@ class JiraSource(SourcePlugin):
                     self.username, self.api_key
                 ),
                 headers={"Accept": "application/json"},
-            )
+            timeout=60)
             if response.status_code != 200:
                 raise Exception(
                     f"Failed to get issues: {response.status_code} {response.text}"
@@ -67,7 +67,7 @@ class JiraSource(SourcePlugin):
                 self.username, self.api_key
             ),
             headers={"Accept": "application/json"},
-        )
+        timeout=60)
         response.raise_for_status()
         data = response.json()
         logging.debug(f"Comment added to issue {issue_id}: {data}")
