@@ -150,7 +150,7 @@ class IssueInvestigator(ToolCallingLLM):
     def investigate(
         self, issue: Issue, prompt: str, console: Console
     ) -> LLMResult:
-        environment = jinja2.Environment()
+        environment = jinja2.Environment(autoescape=True)
         system_prompt_template = environment.from_string(prompt)
         runbooks = self.runbook_manager.get_instructions_for_issue(issue)
         if runbooks:
